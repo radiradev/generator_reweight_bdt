@@ -89,18 +89,20 @@ def predict_weights(filename):
             weights = calculate_weights(y_hat)
             weights_list.append(weights)
             probas_list.append(y_hat)
-            nominal_list.apppend(nominal)
+        
+        # Save the nominal file
+        nominal_list.append(nominal)
         
         # After iterating through create weight files
         weights = np.hstack(weights_list)
         probas = np.vstack(probas_list)
-        nominal = np.vstack(nominal)
-        print(probas.shape, weights.shape)
+        nominal = np.vstack(nominal_list)
     return weights, probas, nominal
 
+# Get weights for nominal array
 weights, probas_nominal, nominal = predict_weights(v2_filename)
-_, probas_target = predict_weights(v3_filename)
 
+# Get target array
 target = np.vstack([rootfile_to_array(filename) for filename in glob.glob(v3_filename)])
 
 plt.hist(weights, bins=100)

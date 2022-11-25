@@ -1,7 +1,8 @@
 import awkward as ak
 import numpy as np
-import torch
 import uproot
+import os
+import torch
 
 def make_cut(pdg):
     """
@@ -14,12 +15,69 @@ def make_cut(pdg):
     cut = proton_muon & multiplicity_cut & pions
     return cut
 
+def get_constants():
+        variables_in = [
+            "cc",
+            "PDGnu",
+            "Enu_true",
+            "ELep",
+            "CosLep",
+            "Q2",
+            "W",
+            "x",
+            "y",
+            "nfsp",
+            "pdg",
+            "E",
+            "px",
+            "py",
+            "pz",
+            "Weight",
+        ]
+
+        variables_out = [
+            "isNu",
+            "isNue",
+            "isNumu",
+            "isNutau",
+            "cc",
+            "Enu_true",
+            "ELep",
+            "CosLep",
+            "Q2",
+            "W",
+            "x",
+            "y",
+            "nP",
+            "nN",
+            "nipip",
+            "nipim",
+            "nipi0",
+            "niem",
+            "eP",
+            "eN",
+            "ePip",
+            "ePim",
+            "ePi0",
+        ]
+        m = {
+            "P": 0.93827,
+            "N": 0.93957,
+            "piC": 0.13957,
+            "pi0": 0.13498,
+            "kC": 0.49368,
+            "k0": 0.49764,
+        }
+        
+        return variables_in, variables_out, m
+
+
 
 def rootfile_to_array(filename, return_weights=False, apply_cut=False):
         variables_in, variables_out, m = get_constants()
 
         with uproot.open(filename + ":FlatTree_VARS") as tree:
-            print("Reading {0}".format(filename))
+            print("Reading {0}".format(os.path.basename(filename)))
             treeArr = tree.arrays(variables_in)
 
             if apply_cut:
@@ -132,66 +190,7 @@ def get_vars_meta(manyBins):
     ).transpose()
     return vars_meta
 
-def get_constants():
-        variables_in = [
-            "cc",
-            "PDGnu",
-            "Enu_true",
-            "ELep",
-            "CosLep",
-            "Q2",
-            "W",
-            "x",
-            "y",
-            "nfsp",
-            "pdg",
-            "E",
-            "px",
-            "py",
-            "pz",
-            "Weight",
-        ]
 
-        variables_out = [
-            "isNu",
-            "isNue",
-            "isNumu",
-            "isNutau",
-            "cc",
-            "Enu_true",
-            "ELep",
-            "CosLep",
-            "Q2",
-            "W",
-            "x",
-            "y",
-            "nP",
-            "nN",
-            "nipip",
-            "nipim",
-            "nipi0",
-            "niem",
-            "eP",
-            "eN",
-            "ePip",
-            "ePim",
-            "ePi0",
-            "pP",
-            "pN",
-            "pPip",
-            "pPim",
-            "pPi0"
-        ]
-        m = {
-            "P": 0.93827,
-            "N": 0.93957,
-            "piC": 0.13957,
-            "pi0": 0.13498,
-            "kC": 0.49368,
-            "k0": 0.49764,
-        }
-
-        return variables_in, variables_out, m
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
