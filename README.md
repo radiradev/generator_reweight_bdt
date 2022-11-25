@@ -6,8 +6,3 @@ Reweighting distributions using a BDT. More info on the methodology in this [pre
 
 # Acknowledgments
 This work is based on work by Cristovao Vilela - [GeneratorReweight](https://github.com/cvilelahep/GeneratorReweight/)
-
-
-git filter-branch --force --index-filter \
-  'git rm -r --cached --ignore-unmatch *' \
-  --prune-empty --tag-name-filter cat -- --all
