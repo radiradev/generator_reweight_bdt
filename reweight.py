@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-from src.utils.funcs import get_vars_meta, rootfile_to_array
-from src.utils.plotting import plot_distribution
+from src.utils.funcs import get_vars_meta, rootfile_to_array, sigmoid
+from src.utils.plotting import plot_distribution, probability_plots
 from trained_bdt.genie_v3_10b import GENIEv3_10b_BDT
 
 # Parse arguments
@@ -88,24 +88,23 @@ def predict_weights(filename):
             # Get weights      
             weights = calculate_weights(y_hat)
             weights_list.append(weights)
-            probas_list.append(y_hat)
+            probas_list.append(sigmoid(y_hat))
         
         # Save the nominal file
         nominal_list.append(nominal)
         
         # After iterating through create weight files
         weights = np.hstack(weights_list)
-        probas = np.vstack(probas_list)
+        probas = np.hstack(probas_list)
         nominal = np.vstack(nominal_list)
     return weights, probas, nominal
 
 # Get weights for nominal array
 weights, probas_nominal, nominal = predict_weights(v2_filename)
-
-# Get target array
-target = np.vstack([rootfile_to_array(filename) for filename in glob.glob(v3_filename)])
+_, probas_target, target = predict_weights(v3_filename)
 
 plt.hist(weights, bins=100)
+plt.xlim(0, 100)
 plt.yscale('log')
 plt.savefig(f"saved_plots/hist.png")
 
@@ -113,7 +112,5 @@ figsize = (12, 10)
 many_bins = 100
 vars_meta = get_vars_meta(many_bins)
 make_plots(nominal, target, weights, vars_meta, figsize)
-
-
-
-
+probability_plots(probas_nominal, probas_target)
+plt.savefig('saved_plots/Probability.png')
