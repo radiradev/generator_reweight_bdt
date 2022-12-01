@@ -50,9 +50,9 @@ def make_plots(nominal, other, predicted_weights, vars_meta, figsize=None):
             plt.show()
 
 
-def calculate_weights(probas):
-    weights = np.clip(probas, 0, 1000)
-    weights = np.exp(weights)
+def calculate_weights(logits):
+    weights = np.exp(logits)
+    weights = np.clip(weights, 0, 1000)
     weights = np.squeeze(np.nan_to_num(weights))
     return weights
 
