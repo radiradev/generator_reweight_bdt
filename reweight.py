@@ -3,10 +3,9 @@ import joblib
 import configparser
 import ast
 
-from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 from utils.funcs import rootfile_to_array, sigmoid
-from utils.funcs import get_variables_out
+
 
 # Parse config
 config = configparser.ConfigParser()
@@ -47,6 +46,7 @@ def predict_weights(filenames, model):
 
             # Get predictions
             batch = nominal[idx_low:idx_high]
+            batch = np.nan_to_num(batch)
             y_hat = model.predict_proba(batch)[:, 1]
             weights = model.predict_proba(batch)[:, 1]/model.predict_proba(batch)[:, 0]
             
