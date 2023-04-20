@@ -4,7 +4,7 @@ import configparser
 import ast
 import numpy as np
 
-from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from utils.funcs import load_files
@@ -45,7 +45,7 @@ def train_classifier(data, labels, filename, weights=None, max_iter=100, max_dep
             data, labels, weights, test_size = 0.2)
 
     #Fit reweighter
-    classifier = HistGradientBoostingClassifier(max_iter=max_iter, verbose=1, max_depth=max_depth, l2_regularization=0.1)
+    classifier = GradientBoostingClassifier(max_iter=max_iter, verbose=1, max_depth=max_depth, l2_regularization=0.1)
     if weights is None:
         classifier.fit(data_train, labels_train)
     else:
