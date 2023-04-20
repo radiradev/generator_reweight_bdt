@@ -13,6 +13,12 @@ The weights are created using the likelihood ratio trick. E.g let $f(x)$ be a cl
 $$w_x = \frac{f(x)}{1-f(x)}$$
 
 
+## Getting Started
+To clone this branch only: 
+```bash	
+git clone --branch sklearn --single-branch https://github.com/radiradev/generator_reweight_bdt
+```
+
 ##  Basic Usage 
 It contains a top level script `run.sh` that will first create a config file, train a BDT, create weights using the trained BDT and finally make plots using the weights. 
 

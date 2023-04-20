@@ -45,7 +45,7 @@ def train_classifier(data, labels, filename, weights=None, max_iter=100, max_dep
             data, labels, weights, test_size = 0.2)
 
     #Fit reweighter
-    classifier = GradientBoostingClassifier(max_iter=max_iter, verbose=1, max_depth=max_depth, l2_regularization=0.1)
+    classifier = GradientBoostingClassifier()
     if weights is None:
         classifier.fit(data_train, labels_train)
     else:
