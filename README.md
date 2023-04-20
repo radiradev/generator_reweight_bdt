@@ -5,14 +5,6 @@
 <img src="assets/0_0.png" alt= “” width="300">
 </center>
 
-<p align="center">
-  <img src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
-</p>
-
-The quadratic equation is given by \[ax^2 + bx + c = 0.\]
-
-
-
 A repository for reweighting between different neutrino generators. 
 
 It works by training a BDT to discriminate between the two generators and then using the BDT to create weights for the events in the generator that we want to reweight to. 
