@@ -46,6 +46,9 @@ def train_classifier(data, labels, filename, weights=None, max_iter=100, max_dep
 
     #Fit reweighter
     classifier = GradientBoostingClassifier()
+    # nan to num to avoid warnings
+    data_train = np.nan_to_num(data_train)
+    data_test = np.nan_to_num(data_test)
     if weights is None:
         classifier.fit(data_train, labels_train)
     else:
