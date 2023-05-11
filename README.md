@@ -18,13 +18,18 @@ To clone this branch only:
 ```bash	
 git clone --branch sklearn --single-branch https://github.com/radiradev/generator_reweight_bdt
 ```
-On lxplus we can source neccessary packages using an LCG view, e.g:
+
+## Environment setup
+
+One should probably setup their own environment so they have full control, however as a quick way to run the code you can use this conda environment:
+```
+conda activate /afs/cern.ch/work/r/rradev/public/envs/pyg_gpu
+```
+
+On lxplus we can source neccessary packages using an LCG view, however this uses an old version of `scikit-learn` without `HistGradientBoostingClassifier`:
 ```
 source /cvmfs/sft.cern.ch/lcg/views/LCG_103swan/x86_64-centos7-gcc11-opt/setup.sh
 ```
-
-
-On a local environment we can install packages using `mamba`. 
 
 
 ##  Basic Usage 

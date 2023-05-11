@@ -12,11 +12,13 @@ GENERATOR_B = 'G1810b'
 def get_filepaths(generator, data_dir=DATA_DIR, mode='train'):
     wildcard = f'{data_dir}flat_vec*_{generator}*.root'
     paths = glob.glob(wildcard)
-    print(len(paths))
+    # split half for train and half for test
+    half_length = len(paths) // 2
+    
     if mode == 'train':
-        return paths[:8]
+        return paths[:half_length]
     else:
-        return paths[8:14]
+        return paths
 
 
 for mode in ['train', 'test']:
