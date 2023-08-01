@@ -18,7 +18,7 @@ nominal_filenames = ast.literal_eval(test['filepaths_a'])
 
 checkpoint_path = f'trained_bdt/{generator_a}_to_{generator_b}/BDT.pkl'
 
-def predict_weights(filenames, model):
+def predict_weights(filenames, model, batch_size=1000, file_length=1_000_000):
     """
     Predict weights for a list of nominal filenames using a trained model
 
@@ -28,15 +28,13 @@ def predict_weights(filenames, model):
 
     Returns:
         weights (np.array): Array of weights
-        probas (np.array): Array of probabilities
-        nominal (np.array): Array of nominal values
     """
-    batch_size = 1000
-    weights_list = []
-    probas_list = []
-    nominal_list = []
-    for filename in filenames:
+    num_files = len(filenames)
+    weights_array = np.zeros(shape=(file_length, num_files))
+    print(weights_array.shape)
+    for j, filename in enumerate(filenames):
         nominal = rootfile_to_array(filename)
+        assert len(nominal) == file_length, f"File {filename} does not have specified length {file_length}"
         n_iterations = int(len(nominal)/batch_size)
         for i in tqdm(range(n_iterations)):
 
@@ -51,12 +49,10 @@ def predict_weights(filenames, model):
             weights = probas[:, 1]/probas[:, 0]
             
             # Get weights     
-            weights_list.append(weights)
+            weights_array[idx_low:idx_high, j] = weights
 
             
-    # After iterating through create weight files
-    weights = np.hstack(weights_list)
-    return weights
+    return weights_array.flatten()
 
 
 
