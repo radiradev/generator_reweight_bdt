@@ -2,7 +2,6 @@ import awkward as ak
 import numpy as np
 import uproot
 import os
-import torch
 
 from config.plots import get_test_vars, direct_test_vars
 
@@ -230,6 +229,7 @@ def sigmoid(x):
 
 
 def compute_histogram(x, bins=100, bin_range=(0,50), density=True, weights=None):
+    import torch
     if weights is None:
         weights = torch.ones_like(x)
     return torch.histogram(x, bins=bins, range=bin_range, density=density, weight=weights.cpu())
@@ -243,6 +243,7 @@ def predict_histogram_weights(nominal, target):
     Returns:
         weights (torch.Tensor): A tensor containing weights for each event in the nominal tensor
     """
+    import torch
     nominal_counts, nominal_edges = compute_histogram(nominal)
     target_counts, _ = compute_histogram(target)
     weights = torch.ones_like(target)

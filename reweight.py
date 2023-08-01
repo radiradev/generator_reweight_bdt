@@ -47,28 +47,23 @@ def predict_weights(filenames, model):
             # Get predictions
             batch = nominal[idx_low:idx_high]
             batch = np.nan_to_num(batch)
-            y_hat = model.predict_proba(batch)[:, 1]
-            weights = model.predict_proba(batch)[:, 1]/model.predict_proba(batch)[:, 0]
+            probas = model.predict_proba(batch)
+            weights = probas[:, 1]/probas[:, 0]
             
             # Get weights     
             weights_list.append(weights)
-            probas_list.append(sigmoid(y_hat))
 
-        # Save the nominal file
-        nominal_list.append(nominal)
             
     # After iterating through create weight files
     weights = np.hstack(weights_list)
-    probas = np.hstack(probas_list)
-    nominal = np.vstack(nominal_list)
-    return weights, probas, nominal
+    return weights
 
 
 
 # Load sklearn model
 model = joblib.load(checkpoint_path)
 # Get weights for nominal array
-weights, probas_nominal, nominal = predict_weights(nominal_filenames, model)
+weights = predict_weights(nominal_filenames, model)
 
 np.save(f'trained_bdt/{generator_a}_to_{generator_b}/weights.npy', weights)
 
