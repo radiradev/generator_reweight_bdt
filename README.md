@@ -26,6 +26,8 @@ One should probably setup their own environment so they have full control, howev
 conda activate /afs/cern.ch/work/r/rradev/public/envs/pyg_gpu
 ```
 
+
+### DO Not Use this for now, instead use conda
 On lxplus we can source neccessary packages using an LCG view, however this uses an old version of `scikit-learn` without `HistGradientBoostingClassifier`:
 ```
 source /cvmfs/sft.cern.ch/lcg/views/LCG_103swan/x86_64-centos7-gcc11-opt/setup.sh
