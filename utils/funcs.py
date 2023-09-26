@@ -5,8 +5,7 @@ import os
 import yaml
 from pathlib import Path
 from config.config import ReweightConfig
-from config.arxiv.plots import get_test_vars, direct_test_vars
-
+from config.archive.plots import direct_test_vars
 
 def load_config(path):
     # Define the path to your YAML file
