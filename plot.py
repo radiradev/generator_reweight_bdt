@@ -7,25 +7,13 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from utils.funcs import load_files
 from utils.plotting import plot_distribution
-from config.plots import plots_meta
 from functools import partial
+from utils.funcs import load_config
+from config.config import ReweightVariable
+from typing import List
 
 
-# Parse config
-config = configparser.ConfigParser()
-config.read('config/files.ini')
-test = config['test']
-generator_a = test['generator_a']
-generator_b = test['generator_b']
-nominal_filenames = ast.literal_eval(test['filepaths_a'])
-target_filenames = ast.literal_eval(test['filepaths_b'])
-
-plots_path = f'plots/{generator_a}_vs_{generator_b}'
-# check if the directory exists
-if not os.path.exists(plots_path):
-    os.makedirs(plots_path)
-
-def make_plots(nominal, other, predicted_weights, target_weights, plots_meta, figsize=None, plots_path='saved_plots'):
+def make_plots(nominal, other, predicted_weights, target_weights, reweight_variables: List[ReweightVariable], figsize=None, plots_path='saved_plots'):
     """
     Make plots for all variables in plots_meta.
 
@@ -34,7 +22,6 @@ def make_plots(nominal, other, predicted_weights, target_weights, plots_meta, fi
         other (np.array): array of other values
         predicted_weights (np.array): array of predicted weights
         target_weights (np.array): array of target weights
-        plots_meta (dict): dictionary of variables to plot
         figsize (tuple): figure size
         plots_path (str): path to save plots
     
@@ -44,13 +31,12 @@ def make_plots(nominal, other, predicted_weights, target_weights, plots_meta, fi
     if figsize is not None:
         plt.rcParams["figure.figsize"] = figsize
 
+
     # save all the plots in a big pdf
     with PdfPages(f'{plots_path}/all_plots.pdf') as pdf:
         # invert columns for plotting
         nominal = np.transpose(nominal)
         other = np.transpose(other) 
-
-        col_names = plots_meta.keys()
 
         plot_current_distribution = partial(
             plot_distribution,
@@ -58,23 +44,22 @@ def make_plots(nominal, other, predicted_weights, target_weights, plots_meta, fi
             weights_target=target_weights,
             errorbars=False,
             density=True,
-            label_nominal=generator_a,
-            label_target=generator_b,
+            label_nominal=config.nominal_name,
+            label_target=config.target_name,
             ratio_limits=(0.8, 1.2),)
 
 
-        for idx, col_title in enumerate(col_names):
-            variable = plots_meta[col_title]
+        for idx, reweight_variable in enumerate(reweight_variables):
             plot_current_distribution(
                 nominal[idx],
                 other[idx],
-                n_bins=variable.n_bins,
-                range=variable.hist_range,
+                n_bins=reweight_variable.n_bins,    
+                range=reweight_variable.hist_range,
             )
-            if variable.train:
-                suptitle = col_title + ' (train)'
+            if not reweight_variable.observer:
+                suptitle = reweight_variable.name + ' (reweighting variable)'
             else:
-                suptitle = col_title + ' (test)'
+                suptitle = reweight_variable.name + ' (observer variable)'
             plt.suptitle(suptitle)
             
             pdf.savefig()
@@ -83,28 +68,33 @@ def make_plots(nominal, other, predicted_weights, target_weights, plots_meta, fi
             if not os.path.exists(f'{plots_path}/png_format'):
                 os.makedirs(f'{plots_path}/png_format')
             
-            plt.savefig(f"{plots_path}/png_format/{col_title}.png")
+            plt.savefig(f"{plots_path}/png_format/{reweight_variable.name}.png")
 
+
+config = load_config(path='config/hA2018_to_noFSI.yaml')
 
 #Load weights
-weights = np.load(f'trained_bdt/{generator_a}_to_{generator_b}/weights.npy') 
+weights = np.load(f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights.npy')
 
 
+plots_path = os.path.join(config.plots_path, f'{config.nominal_name}_to_{config.target_name}')
 # Plot weights
+
+print(weights.shape)
 plt.hist(weights, bins=100)
 plt.yscale('log')
 plt.title('Weights')
+if not os.path.exists(f'{plots_path}'):
+    os.makedirs(f'{plots_path}')
 plt.savefig(f"{plots_path}/hist.png")
 plt.show()
 
 
-nominal = load_files(nominal_filenames, test_data=True)
-target, target_weights = load_files(target_filenames, test_data=True, return_weights=True)
-
+nominal = load_files([config.nominal_files], variables_out=config.reweight_variables_names)[:config.number_of_train_events]
+target = load_files([config.target_files], variables_out=config.reweight_variables_names)[:config.number_of_train_events]
+target_weights = np.ones(len(target))
 # Check that files were loaded
 assert len(nominal) > 0, 'No files found for nominal'
 
 figsize = (12, 10)
-n_bins = 100
-vars_meta = plots_meta(n_bins)
-make_plots(nominal, target, weights, target_weights, vars_meta, figsize, plots_path=plots_path)
+make_plots(nominal, target, weights, target_weights, config.reweight_variables, figsize, plots_path=plots_path)

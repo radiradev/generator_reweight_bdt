@@ -1,26 +1,14 @@
 import pickle
 import os
-import configparser
-import ast
 import numpy as np
-
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from utils.funcs import load_files
+from utils.funcs import load_config
 
 
-# Parse config
-config = configparser.ConfigParser()
-config.read('config/files.ini')
-train = config['train']
-generator_a = train['generator_a']
-generator_b = train['generator_b']
-nominal_filename = ast.literal_eval(train['filepaths_a'])
-target_filename = ast.literal_eval(train['filepaths_b'])
-
-
-def train_classifier(data, labels, filename, weights=None, max_iter=100, max_depth=5):
+def train_classifier(data, labels, filename, weights=None, max_iter=500, max_depth=15):
     """
     Train a classifier and save it to a pickle file
 
@@ -66,22 +54,30 @@ def train_classifier(data, labels, filename, weights=None, max_iter=100, max_dep
     print(f'ROC score: {clf_score}')
 
 
+config = load_config(path='config/hA2018_to_noFSI.yaml')
 
-# Load data
-nominal = load_files(nominal_filename, return_weights=False)
-target = load_files(target_filename, return_weights=False)
+def load_data(num_events=None):
+    # Load data
+    nominal = load_files([config.nominal_files], return_weights=False, variables_out=config.reweight_variables_names)
+    target = load_files([config.target_files], return_weights=False, variables_out=config.reweight_variables_names)
+    if num_events is not None:
+        nominal = nominal[num_events:]
+        target = target[num_events:]
+    # Concatenate datas
+    data = np.concatenate((nominal, target))
+    print(f'Data shape {data.shape}')
+    labels = np.concatenate((np.zeros(len(nominal)), np.ones(len(target))))
+    return data, labels
 
-# Concatenate data
-data = np.concatenate((nominal, target))
-print(f'Data shape {data.shape}')
-labels = np.concatenate((np.zeros(len(nominal)), np.ones(len(target))))
+# load data
+data, labels = load_data(config.number_of_train_events)
 
 # train the bdt
-save_path = f'trained_bdt/{generator_a}_to_{generator_b}/BDT.pkl'
+ckpt_path = f'trained_bdt/{config.nominal_name}_to_{config.target_name}/BDT.pkl'
 # check if the directory exists and create it if not
-if not os.path.exists(os.path.dirname(save_path)):
-    os.makedirs(os.path.dirname(save_path))
+if not os.path.exists(os.path.dirname(ckpt_path)):
+    os.makedirs(os.path.dirname(ckpt_path))
 
-train_classifier(data, labels, save_path)
+train_classifier(data, labels, ckpt_path)
 
 

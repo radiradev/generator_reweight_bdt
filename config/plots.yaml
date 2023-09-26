@@ -1,0 +1,201 @@
+
+CosLep:
+  hist_range:
+  - -1.0
+  - 1.0
+  n_bins: 100
+ELep:
+  hist_range:
+  - 0.0
+  - 5.0
+  n_bins: 100
+Eav:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 100
+EavAlt:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 100
+Enu_true:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 100
+Erec:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 100
+Erec_bias_abs:
+  hist_range:
+  - -5.0
+  - 0.0
+  n_bins: 100
+Erec_bias_rel:
+  hist_range:
+  - -1.0
+  - 0.0
+  n_bins: 100
+LeadPN:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+LeadPP:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+LeadPPi0:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+LeadPPim:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+LeadPPip:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+Q2:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 100
+W:
+  hist_range:
+  - 0.0
+  - 5.0
+  n_bins: 100
+cc:
+  hist_range:
+  - 0.0
+  - 1.0
+  n_bins: 2
+dalphat:
+  hist_range:
+  - 0.0
+  - 3.0
+  n_bins: 100
+dphit:
+  hist_range:
+  - 0.0
+  - 3.0
+  n_bins: 100
+dpt:
+  hist_range:
+  - 0.0
+  - 2000.0
+  n_bins: 50
+eN:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+eP:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+ePi0:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+ePim:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+ePip:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+isNu:
+  hist_range:
+  - 0.0
+  - 1.0
+  n_bins: 2
+isNue:
+  hist_range:
+  - 0.0
+  - 1.0
+  n_bins: 2
+isNumu:
+  hist_range:
+  - 0.0
+  - 1.0
+  n_bins: 2
+isNutau:
+  hist_range:
+  - 0.0
+  - 1.0
+  n_bins: 2
+nN:
+  hist_range:
+  - 0.0
+  - 15.0
+  n_bins: 15
+nP:
+  hist_range:
+  - 0.0
+  - 15.0
+  n_bins: 15
+niem:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 10
+nipi0:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 10
+nipim:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 10
+nipip:
+  hist_range:
+  - 0.0
+  - 10.0
+  n_bins: 10
+pLep:
+  hist_range:
+  - 0.01
+  - 5.0
+  n_bins: 99
+pnreco_C:
+  hist_range:
+  - 0.0
+  - 2.0
+  n_bins: 100
+q0:
+  hist_range:
+  - 0.0
+  - 20.0
+  n_bins: 100
+q3:
+  hist_range:
+  - 0.0
+  - 20.0
+  n_bins: 100
+x:
+  hist_range:
+  - 0.0
+  - 1.0
+  n_bins: 100
+y:
+  hist_range:
+  - 0.0
+  - 1.0
+  n_bins: 100

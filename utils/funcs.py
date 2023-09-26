@@ -2,8 +2,22 @@ import awkward as ak
 import numpy as np
 import uproot
 import os
+import yaml
+from pathlib import Path
+from config.config import ReweightConfig
+from config.arxiv.plots import get_test_vars, direct_test_vars
 
-from config.plots import get_test_vars, direct_test_vars
+
+def load_config(path):
+    # Define the path to your YAML file
+    yaml_file_path = Path(path)
+
+    # Load the YAML file
+    with open(yaml_file_path, 'r') as file:
+        yaml_config = yaml.safe_load(file)
+    # Create an instance of ReweightConfig
+    config = ReweightConfig(**yaml_config)
+    return config
 
 def get_variables_in(test_data=False):
     variables_in = [
@@ -17,7 +31,6 @@ def get_variables_in(test_data=False):
             "W",
             "x",
             "y",
-            "nfsp",
             "pdg",
             "E",
             "px",
@@ -25,8 +38,7 @@ def get_variables_in(test_data=False):
             "pz",
             "Weight"]
 
-    if test_data:
-        variables_in += list(direct_test_vars().keys())
+    variables_in += list(direct_test_vars().keys())
 
 def get_variables_out():
     return  [
@@ -37,7 +49,7 @@ def get_variables_out():
             "cc",
             "Enu_true",
             "ELep",
-            "Eav",
+            "EavAlt",
             "CosLep",
             "Q2",
             "W",
@@ -101,17 +113,18 @@ def compute_Erec(treeArr):
     Elep = treeArr['ELep']
     muon_mass = 0.105658 # GeV
     treeArr['pLep'] = np.sqrt(Elep**2 - muon_mass**2)
-    treeArr['Erec'] = Elep + treeArr['Eav']
+    treeArr['Erec'] = Elep + treeArr['EavAlt']
     treeArr['Erec_bias_abs'] = treeArr['Erec'] - treeArr['Enu_true']
     treeArr['Erec_bias_rel'] = treeArr['Erec_bias_abs'] / Elep
     return treeArr
 
 
-def rootfile_to_array(filename, return_weights=False, test_data=False):
-        variables_in, variables_out, m = get_variables_in(test_data), get_variables_out(), get_mass()
-
-        with uproot.open(filename + ":FlatTree_VARS") as tree:
-            print("Reading {0}".format(os.path.basename(filename)))
+# TODO File loading is a huge mess and needs to be refactored completely
+def rootfile_to_array(filename, variables_out=get_variables_out(), return_weights=False, compute_leading_momentum=False):
+        variables_in, m = get_variables_in(), get_mass()
+        
+        with uproot.open(filename)["FlatTree_VARS"] as tree:
+            print(f"Reading {os.path.basename(filename)}")
             treeArr = tree.arrays(variables_in)
 
 
@@ -170,7 +183,6 @@ def rootfile_to_array(filename, return_weights=False, test_data=False):
                 0.5,
                 axis=1,
             )
-
             # One hot encoding of nutype
             treeArr["isNu"] = treeArr["PDGnu"] > 0
             treeArr["isNue"] = abs(treeArr["PDGnu"]) == 12
@@ -182,21 +194,15 @@ def rootfile_to_array(filename, return_weights=False, test_data=False):
             pdg = treeArr['pdg']
             # Convert to float32
 
-            if test_data:
-                treeArr = compute_Erec(treeArr)
-                extra_vars = list(get_test_vars().keys())
-                extra_vars = [x for x in extra_vars if 'Lead' not in x]
-                variables_out = variables_out + extra_vars
-                
+            treeArr = compute_Erec(treeArr)
             treeArr = ak.values_astype(treeArr[variables_out], np.float32)
 
             data = ak.to_numpy(treeArr)
             data = data.view(np.float32).reshape(
                 (len(data), len(variables_out)))
 
-
-            # Append the leading momenta of the particles
-            if test_data:
+            if compute_leading_momentum:
+                # This also has to be refactored : changing the config wont affect this
                 leading_momenta = calculate_leading_momentum(pdg, p)
                 data = np.concatenate((data, leading_momenta), axis=1)
                 
@@ -205,24 +211,15 @@ def rootfile_to_array(filename, return_weights=False, test_data=False):
                 
             return data.astype(np.float32)
 
-def load_files(filenames, test_data=False, return_weights=False):
-    if test_data and not return_weights:
-        return np.vstack([rootfile_to_array(name, test_data=True) for name in filenames])
-
-    if return_weights and not test_data:
-        data, weights = zip(*[rootfile_to_array(name, return_weights=True) for name in filenames])
+def load_files(filenames, return_weights=False, variables_out=get_variables_out()):
+    if return_weights:
+        data, weights = zip(*[rootfile_to_array(name, return_weights=True, variables_out=variables_out) for name in filenames])
         data = np.vstack(data)
         weights = np.concatenate(weights)
         return data, weights
 
-    if return_weights and test_data:
-        data, weights = zip(*[rootfile_to_array(name, test_data=True, return_weights=True) for name in filenames])
-        data = np.vstack(data)
-        weights = np.concatenate(weights)
-        return data, weights
-
-    # if not test_data and not return_weights:
-    return np.vstack([rootfile_to_array(name) for name in filenames])
+    # if not return_weights:
+    return np.vstack([rootfile_to_array(name, variables_out=variables_out) for name in filenames])
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))

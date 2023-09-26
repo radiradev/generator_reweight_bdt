@@ -4,7 +4,7 @@ from dataclasses import dataclass
 class TrainVariable:
     n_bins: int 
     hist_range: tuple
-    train: bool = True
+    reweight_variable: bool = True
 
 def train_var(n_bins, hist_range, train=True):
     return TrainVariable(n_bins, hist_range, train)
@@ -99,7 +99,6 @@ def get_pair_variables(pair_bins=30):
         "x_y" : pair_vars(["x", "y"], [pair_bins, pair_bins], [(0.1, 1.0), (0.1, 1.0)]),
         "Enu_true_Erec" : pair_vars(["Enu_true", "Erec"], [pair_bins, pair_bins], [(0.0, 10.0), (0.0, 5.0)]),
     }
-
 
 
 

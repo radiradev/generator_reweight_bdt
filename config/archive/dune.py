@@ -3,11 +3,14 @@ import glob
 #Get the configparser object
 config = ConfigParser()
 
+
+### Old 
 DATA_DIR = '/eos/project/n/neutrino-generators/generatorOutput/GENIE/DIRT_II_Studies/DUNE_Ar_numu/'
 MODE = 14
 GENERATOR_A = 'G1810a'
 GENERATOR_B = 'G1810b'
 
+### New reweighting 
 
 def get_filepaths(generator, data_dir=DATA_DIR, mode='train'):
     wildcard = f'{data_dir}flat_vec*_{generator}*.root'
