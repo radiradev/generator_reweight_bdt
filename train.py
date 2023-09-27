@@ -1,7 +1,7 @@
 import pickle
 import os
 import numpy as np
-from sklearn.ensemble import HistGradientBoostingClassifier
+from lightgbm import LGBMClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from utils.funcs import load_files
@@ -33,7 +33,7 @@ def train_classifier(data, labels, filename, weights=None, max_iter=500, max_dep
             data, labels, weights, test_size = 0.2)
 
     #Fit reweighter
-    classifier = HistGradientBoostingClassifier(max_iter=max_iter, verbose=1, max_depth=max_depth, l2_regularization=0.1)
+    classifier = LGBMClassifier(boosting_type='gbdt', verbose=1, max_depth=max_depth, max_iter=max_iter)
 
     # TODO investigate nan values
     data_train = np.nan_to_num(data_train)
