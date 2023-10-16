@@ -141,11 +141,7 @@ def plot_distribution(nominal,
                       density=True,
                       ratio_limits=None,
                       kl_div=True):
-    if range is None:
-        min_val = 0
-        max_val = np.min([np.max(nominal), np.max(target)])
-        range = (min_val, max_val)
-
+    plt.rcParams['figure.figsize'] = (12, 10)
     fig, axs = plt.subplots(2, 1)
 
     # Create legend labels
@@ -155,6 +151,8 @@ def plot_distribution(nominal,
         label_target = 'Target'
     label_reweighted = f'{label_nominal} to {label_target}'
 
+    if weights_target is None:
+        weights_target = np.ones_like(target)
     # Histograms
     counts_ref, bins_ref, _ = axs[0].hist(target,
                                           weights=weights_target,
@@ -225,7 +223,7 @@ def ratio_plot(bins_ref,
                label,
                ratio_limits=None):
     if ratio_limits is None:
-        ratio_limits = (0.5, 1.5)
+        ratio_limits = (0.8, 1.2)
     ratio_limit_low, ratio_limit_high = ratio_limits
     x_values, y_values, y_errors = ratios(bins_ref, counts_ref, counts)
     axs[1].plot(x_values, np.ones_like(counts_ref), '--')

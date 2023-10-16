@@ -58,8 +58,8 @@ config = load_config(path='config/hA2018_to_noFSI.yaml')
 
 def load_data(num_events=None):
     # Load data
-    nominal = load_files([config.nominal_files], return_weights=False, variables_out=config.reweight_variables_names)
-    target = load_files([config.target_files], return_weights=False, variables_out=config.reweight_variables_names)
+    nominal = load_files(config.nominal_files, config.reweight_variables_names, return_dataframe=True)
+    target = load_files(config.target_files, config.reweight_variables_names, return_dataframe=True)
     if num_events is not None:
         nominal = nominal[num_events:]
         target = target[num_events:]

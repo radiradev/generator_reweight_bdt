@@ -8,6 +8,8 @@
 # Local History for Visual Studio Code
 .history/
 
+.git*
+symbolic_regression/
 
 trained_bdt/
 # Byte-compiled / optimized / DLL files

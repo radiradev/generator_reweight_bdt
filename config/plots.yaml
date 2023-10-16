@@ -31,12 +31,12 @@ Erec:
   n_bins: 100
 Erec_bias_abs:
   hist_range:
-  - -5.0
+  - -1.0
   - 0.0
   n_bins: 100
 Erec_bias_rel:
   hist_range:
-  - -1.0
+  - -0.5
   - 0.0
   n_bins: 100
 LeadPN:

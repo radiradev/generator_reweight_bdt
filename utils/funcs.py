@@ -6,6 +6,7 @@ import yaml
 from pathlib import Path
 from config.config import ReweightConfig
 from config.archive.plots import direct_test_vars
+import pandas as pd
 
 def load_config(path):
     # Define the path to your YAML file
@@ -119,7 +120,7 @@ def compute_Erec(treeArr):
 
 
 # TODO File loading is a huge mess and needs to be refactored completely
-def rootfile_to_array(filename, variables_out=get_variables_out(), return_weights=False, compute_leading_momentum=False):
+def rootfile_to_array(filename, variables_out, return_weights=False, compute_leading_momentum=False, return_dataframe=False):
         variables_in, m = get_variables_in(), get_mass()
         
         with uproot.open(filename)["FlatTree_VARS"] as tree:
@@ -207,19 +208,18 @@ def rootfile_to_array(filename, variables_out=get_variables_out(), return_weight
                 
             if return_weights:
                 return data, np.expand_dims(weights, axis=1)
-                
-            return data.astype(np.float32)
+            
+            if return_dataframe:
+                return pd.DataFrame(data, columns=variables_out)
 
-def load_files(filenames, return_weights=False, variables_out=get_variables_out()):
-    if return_weights:
-        data, weights = zip(*[rootfile_to_array(name, return_weights=True, variables_out=variables_out) for name in filenames])
-        data = np.vstack(data)
-        weights = np.concatenate(weights)
-        return data, weights
 
-    # if not return_weights:
-    return np.vstack([rootfile_to_array(name, variables_out=variables_out) for name in filenames])
+            return data
 
+def load_files(filenames, reweight_variables, return_dataframe=False):
+    if return_dataframe:
+        return rootfile_to_array(filenames, reweight_variables, return_dataframe=return_dataframe)
+    else: 
+        raise NotImplementedError
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 

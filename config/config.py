@@ -75,3 +75,21 @@ class ReweightConfig(BaseModel):
             else:
                 print(f"Details for {name} not found in {self.variables_plotting_info}")
         return variables
+    
+    def get_variable_by_name(self, variable_name: str) -> Optional[ReweightVariable]:
+        """Get a ReweightVariable object by its name.
+        
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to fetch.
+
+        Returns
+        -------
+        Optional[ReweightVariable]
+            The ReweightVariable object if found, otherwise None.
+        """
+        for variable in self.reweight_variables:
+            if variable.name == variable_name:
+                return variable
+        return None
