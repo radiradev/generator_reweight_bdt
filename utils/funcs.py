@@ -215,11 +215,14 @@ def rootfile_to_array(filename, variables_out, return_weights=False, compute_lea
 
             return data
 
-def load_files(filenames, reweight_variables, return_dataframe=False):
-    if return_dataframe:
+def load_files(filenames, reweight_variables):
+    return_dataframe = True
+    if len(filenames) == 1 or isinstance(filenames, str):  #filename is str
         return rootfile_to_array(filenames, reweight_variables, return_dataframe=return_dataframe)
     else: 
-        raise NotImplementedError
+        dataframes = [rootfile_to_array(filename, reweight_variables, return_dataframe=True) for filename in filenames]
+        return pd.concat(dataframes, ignore_index=True)
+
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 

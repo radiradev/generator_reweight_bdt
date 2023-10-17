@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from utils.funcs import load_files
 from utils.funcs import load_config
+import pandas as pd
 
 
 def train_classifier(data, labels, filename, weights=None, max_iter=500, max_depth=15):
@@ -54,24 +55,24 @@ def train_classifier(data, labels, filename, weights=None, max_iter=500, max_dep
     print(f'ROC score: {clf_score}')
 
 
-config = load_config(path='config/hA2018_to_noFSI.yaml')
+config = load_config(path='config/hA(10a)_to_INCL(10c).yaml')
 
 def load_data(num_events=None):
     # Load data
     nominal = load_files(config.nominal_files, config.reweight_variables_names, return_dataframe=True)
     target = load_files(config.target_files, config.reweight_variables_names, return_dataframe=True)
-    if num_events is not None:
+    if num_events != -1:
         nominal = nominal[num_events:]
         target = target[num_events:]
     # Concatenate datas
-    data = np.concatenate((nominal, target))
+    data = pd.concat([nominal, target], ignore_index=True)
     print(f'Data shape {data.shape}')
     labels = np.concatenate((np.zeros(len(nominal)), np.ones(len(target))))
     return data, labels
 
 # load data
 data, labels = load_data(config.number_of_train_events)
-
+print(data)
 # train the bdt
 ckpt_path = f'trained_bdt/{config.nominal_name}_to_{config.target_name}/BDT.pkl'
 # check if the directory exists and create it if not

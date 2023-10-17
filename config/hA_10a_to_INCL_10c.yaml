@@ -1,0 +1,32 @@
+# Nicer Config :) 
+
+nominal_name: hA_10a
+target_name: INCL_10c
+
+# probably directory should be seperated :)
+nominal_files: 
+  /global/cfs/cdirs/dune/users/cwilk/MC_IOP_review/GENIEv3_G18_10a_00_000/DUNEND_FHC_numu_Ar40_GENIEv3_G18_10a_00_000_1M_0000_NUISFLAT.root
+target_files: 
+  /global/cfs/cdirs/dune/users/cwilk/MC_IOP_review/GENIEv3_G18_10c_00_000/DUNEND_FHC_numu_Ar40_GENIEv3_G18_10c_00_000_1M_0000_NUISFLAT.root
+
+plotting_nominal_pattern:
+  /global/cfs/cdirs/dune/users/cwilk/MC_IOP_review/GENIEv3_G18_10a_00_000/DUNEND_FHC_numu_Ar40_GENIEv3_G18_10a_00_000_1M_000[1-2]_NUISFLAT.root
+
+plotting_nominal_oscillated_pattern:
+  /global/cfs/cdirs/dune/users/cwilk/MC_IOP_review/GENIEv3_G18_10a_00_000/DUNEFD_osc_FHC_numu_Ar40_GENIEv3_G18_10a_00_000_1M_000[0-2]_NUISFLAT.root
+
+plotting_target_pattern:
+  /global/cfs/cdirs/dune/users/cwilk/MC_IOP_review/GENIEv3_G18_10c_00_000/DUNEND_FHC_numu_Ar40_GENIEv3_G18_10c_00_000_1M_000[1-2]_NUISFLAT.root
+
+plotting_target_oscillated_pattern:
+  /global/cfs/cdirs/dune/users/cwilk/MC_IOP_review/GENIEv3_G18_10c_00_000/DUNEFD_osc_FHC_numu_Ar40_GENIEv3_G18_10c_00_000_1M_000[0-2]_NUISFLAT.root
+
+number_of_train_events:
+  -1
+
+reweight_variables_names: 
+  [Enu_true, CosLep, ELep, EavAlt, Erec_bias_abs, Erec_bias_rel]
+
+# should not be part of config, they stay the same
+bdt_ckpt_path: /global/homes/r/rradev/generator_reweight_bdt/trained_bdt
+plots_path: /global/homes/r/rradev/generator_reweight_bdt/plots
