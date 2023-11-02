@@ -9,15 +9,18 @@ from utils.funcs import load_config
 from config.config import ReweightVariable
 from config.config import ReweightConfig
 import pandas as pd
+import fire
 
 def make_plots(nominal, target, weights, config: ReweightConfig, plot_name: str):
     # save all the plots in a big pdf
+        
     with PdfPages(f'{plots_path}/{plot_name}_reweight_variables.pdf') as pdf:
         for variable in config.reweight_variables:
             _plot(nominal, target, variable, weights, plot_name)
             pdf.savefig()
 
-def _plot(nominal: pd.DataFrame,
+def _plot(
+          nominal: pd.DataFrame,
           target: pd.DataFrame,
           reweight_variable: ReweightVariable,
           weights: np.array,
@@ -91,47 +94,53 @@ def plots_at_bins(nominal: pd.DataFrame,
     return None
 
 
-config = load_config(path='config/hA_10a_to_INCL_10c.yaml')
 
-#Load weights
-weights = np.load(
-    f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights.npy')
+def main(config_name):
+    global config
+    config = load_config(path=f'config/{config_name}')
+    #Load weights
+    weights = np.load(
+        f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights.npy')
+    
+    global plots_path
+    plots_path = check_plots_path(config)
 
-plots_path = check_plots_path(config)
+    # Plot weights
+    plot_weights(weights, name='near')
 
-# Plot weights
-plot_weights(weights, name='near')
+    nominal = load_files(config.plotting_nominal,
+                        config.reweight_variables_names)
+    target = load_files(config.plotting_target,
+                        config.reweight_variables_names)
+    if config.number_of_train_events != -1:
+        # TODO need to refactor 
+        nominal = nominal[:config.number_of_train_events]
+        target = target[:config.number_of_train_events]
 
-nominal = load_files(config.plotting_nominal,
-                    config.reweight_variables_names)
-target = load_files(config.plotting_target,
-                    config.reweight_variables_names)
-if config.number_of_train_events != -1:
-    # TODO need to refactor 
-    nominal = nominal[:config.number_of_train_events]
-    target = target[:config.number_of_train_events]
+    # Check that files were loaded
+    assert len(nominal) > 0, 'No files found for nominal'
 
-# Check that files were loaded
-assert len(nominal) > 0, 'No files found for nominal'
+    plots_at_bins(nominal, target, weights, config, plot_name='near')
+    make_plots(nominal, target, weights, config, plot_name='near')
 
-plots_at_bins(nominal, target, weights, config, plot_name='near')
-make_plots(nominal, target, weights, config, plot_name='near')
-
-# plot oscillated files
+    # plot oscillated files
 
 
-weights_oscillated = np.load(
-    f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights_oscillated.npy')
-assert np.array_equal(weights, weights_oscillated) == False, "Should have different shapes"
-plot_weights(weights_oscillated, name='far_oscillated')
+    weights_oscillated = np.load(
+        f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights_oscillated.npy')
+    assert np.array_equal(weights, weights_oscillated) == False, "Should have different shapes"
+    plot_weights(weights_oscillated, name='far_oscillated')
 
-nominal_oscillated = load_files(
-    config.plotting_nominal_oscillated,
-    config.reweight_variables_names,
-)
-target_oscillated = load_files(
-    config.plotting_target_oscillated,
-    config.reweight_variables_names
-)
-plots_at_bins(nominal_oscillated, target_oscillated, weights_oscillated, config, plot_name='far_oscillated')
-make_plots(nominal_oscillated, target_oscillated, weights_oscillated, config, plot_name='far_oscillated')
+    nominal_oscillated = load_files(
+        config.plotting_nominal_oscillated,
+        config.reweight_variables_names,
+    )
+    target_oscillated = load_files(
+        config.plotting_target_oscillated,
+        config.reweight_variables_names
+    )
+    plots_at_bins(nominal_oscillated, target_oscillated, weights_oscillated, config, plot_name='far_oscillated')
+    make_plots(nominal_oscillated, target_oscillated, weights_oscillated, config, plot_name='far_oscillated')
+
+if __name__ == '__main__':
+    fire.Fire(main)

@@ -3,7 +3,7 @@ import numpy as np
 import uproot
 import os
 import yaml
-from pathlib import Path
+from pathlib import Path, PosixPath
 from config.config import ReweightConfig
 from config.archive.plots import direct_test_vars
 import pandas as pd
@@ -217,7 +217,7 @@ def rootfile_to_array(filename, variables_out, return_weights=False, compute_lea
 
 def load_files(filenames, reweight_variables):
     return_dataframe = True
-    if len(filenames) == 1 or isinstance(filenames, str):  #filename is str
+    if isinstance(filenames, str) or isinstance(filenames, PosixPath):  #filename is str
         return rootfile_to_array(filenames, reweight_variables, return_dataframe=return_dataframe)
     else: 
         dataframes = [rootfile_to_array(filename, reweight_variables, return_dataframe=True) for filename in filenames]

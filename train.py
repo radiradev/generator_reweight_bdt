@@ -7,6 +7,7 @@ from sklearn.metrics import roc_auc_score
 from utils.funcs import load_files
 from utils.funcs import load_config
 import pandas as pd
+import fire
 
 
 def train_classifier(data, labels, filename, weights=None, max_iter=500, max_depth=15):
@@ -34,7 +35,7 @@ def train_classifier(data, labels, filename, weights=None, max_iter=500, max_dep
             data, labels, weights, test_size = 0.2)
 
     #Fit reweighter
-    classifier = LGBMClassifier(boosting_type='gbdt', verbose=1, max_depth=max_depth, max_iter=max_iter)
+    classifier = LGBMClassifier(boosting_type='gbdt', verbose=1)
 
     # TODO investigate nan values
     data_train = np.nan_to_num(data_train)
@@ -55,12 +56,12 @@ def train_classifier(data, labels, filename, weights=None, max_iter=500, max_dep
     print(f'ROC score: {clf_score}')
 
 
-config = load_config(path='config/hA(10a)_to_INCL(10c).yaml')
 
-def load_data(num_events=None):
+
+def load_data(config, num_events=None):
     # Load data
-    nominal = load_files(config.nominal_files, config.reweight_variables_names, return_dataframe=True)
-    target = load_files(config.target_files, config.reweight_variables_names, return_dataframe=True)
+    nominal = load_files(config.nominal_files, config.reweight_variables_names)
+    target = load_files(config.target_files, config.reweight_variables_names)
     if num_events != -1:
         nominal = nominal[num_events:]
         target = target[num_events:]
@@ -71,14 +72,18 @@ def load_data(num_events=None):
     return data, labels
 
 # load data
-data, labels = load_data(config.number_of_train_events)
-print(data)
-# train the bdt
-ckpt_path = f'trained_bdt/{config.nominal_name}_to_{config.target_name}/BDT.pkl'
-# check if the directory exists and create it if not
-if not os.path.exists(os.path.dirname(ckpt_path)):
-    os.makedirs(os.path.dirname(ckpt_path))
+def train(config_name):
+    config = load_config(path=os.path.realpath(f"config/{config_name}"))
+    data, labels = load_data(config, config.number_of_train_events, )
+    print(data.head())
+    # train the bdt
+    ckpt_path = f'trained_bdt/{config.nominal_name}_to_{config.target_name}/BDT.pkl'
+    # check if the directory exists and create it if not
+    if not os.path.exists(os.path.dirname(ckpt_path)):
+        os.makedirs(os.path.dirname(ckpt_path))
 
-train_classifier(data, labels, ckpt_path)
+    train_classifier(data, labels, ckpt_path)
 
+if __name__ == "__main__":
+    fire.Fire(train)
 

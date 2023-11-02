@@ -5,9 +5,10 @@ from tqdm import tqdm
 from utils.funcs import rootfile_to_array, load_config, load_files
 from functools import partial
 import pandas as pd 
+import fire
 
 
-def predict_weights(filenames, model):
+def predict_weights(config, filenames, model):
     """
     Predict weights for a list of nominal filenames using a trained model
 
@@ -25,14 +26,18 @@ def predict_weights(filenames, model):
     return weights
 
 
-config = load_config(path='config/hA_10a_to_INCL_10c.yaml')
-ckpt_path = f'trained_bdt/{config.nominal_name}_to_{config.target_name}/BDT.pkl'
-# Load sklearn model
-model = joblib.load(ckpt_path)
-# Get weights for nominal array
-weights = predict_weights(config.plotting_nominal, model)
-np.save(f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights.npy', weights)
+def reweight(config_name):
+    config = load_config(path=f"config/{config_name}")
+    ckpt_path = f'trained_bdt/{config.nominal_name}_to_{config.target_name}/BDT.pkl'
+    # Load sklearn model
+    model = joblib.load(ckpt_path)
+    # Get weights for nominal array
+    weights = predict_weights(config, config.plotting_nominal, model)
+    np.save(f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights.npy', weights)
 
-# TODO check if this exists in the config
-oscillated_weights = predict_weights(config.plotting_nominal_oscillated, model)
-np.save(f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights_oscillated.npy', oscillated_weights)
+    # TODO check if this exists in the config
+    oscillated_weights = predict_weights(config, config.plotting_nominal_oscillated, model)
+    np.save(f'trained_bdt/{config.nominal_name}_to_{config.target_name}/weights_oscillated.npy', oscillated_weights)
+
+if __name__ == '__main__':
+    fire.Fire(reweight)
